@@ -85,7 +85,7 @@ def naver_news_skill():
         })
 
     query = urllib.parse.quote(user_input)
-    url = f"https://search.naver.com/search.naver?where=news&query={query}"
+    url = f"https://search.naver.com/search.naver?where=news&ie=utf8&sm=nws_hty&query={query}"
 
     headers = {
         "User-Agent": "Mozilla/5.0"
