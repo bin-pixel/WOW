@@ -112,6 +112,41 @@ def google_news():
         result = f"뉴스 조회 중 오류 발생: {str(e)}"
 
     return jsonify(kakao_text(result))
+    
+@app.route("/namu-search", methods=["POST"])
+def namu_search():
+    data = request.get_json(silent=True) or {}
+    keyword = data.get("action", {}).get("params", {}).get("파라미터", "").strip()
+
+    if not keyword:
+        return jsonify(kakao_text("검색어를 입력해주세요."))
+
+    # 구글 RSS를 사용해 나무위키 내 문서만 검색하도록 쿼리 설정
+    query = urllib.parse.quote(f"{keyword} site:namu.wiki")
+    url = f"https://news.google.com/rss/search?q={query}&hl=ko&gl=KR&ceid=KR:ko"
+    headers = {"User-Agent": "Mozilla/5.0"}
+
+    try:
+        r = requests.get(url, headers=headers, timeout=10)
+        soup = BeautifulSoup(r.text, "xml")
+        items = soup.find_all("item")
+
+        results = []
+        for item in items[:3]:  # 상위 3개만 추출
+            title = item.title.text.replace(" - 나무위키", "").strip()
+            link = item.link.text
+            if title and link:
+                results.append(f"🔗 {title}\n{link}")
+
+        if results:
+            text_res = f"🔍 ['{keyword}'] 나무위키 검색 결과:\n\n" + "\n\n".join(results)
+        else:
+            text_res = f"['{keyword}']에 대한 나무위키 문서 링크를 찾지 못했습니다."
+
+    except Exception as e:
+        text_res = f"나무위키 검색 중 오류 발생: {str(e)}"
+
+    return jsonify(kakao_text(text_res))
 
 # 5. 파라미터로 ChatGPT 연동하기
 @app.route("/chatgpt-param", methods=["POST"])
