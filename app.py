@@ -121,24 +121,24 @@ def namu_link():
     if not keyword:
         return jsonify(kakao_text("검색어를 입력해주세요."))
 
-    # 1. URL 인코딩 (공백이나 한글을 URL 규격에 맞게 변환, 예: IT -> IT, 파이썬 -> %ED%8C%8C%EC%9D%B4%EC%A1%AC)
-    encoded_keyword = urllib.parse.quote(keyword)
+    # 한글 깨짐 및 카카오톡 브라우저 오작동 방지를 위한 인코딩 안전장치
+    encoded_keyword = urllib.parse.quote(keyword, safe="")
     namu_url = f"https://namu.wiki/w/{encoded_keyword}"
 
-    # 2. 카카오톡 버튼(Link)을 포함한 응답 생성
     response = {
         "version": "2.0",
         "template": {
             "outputs": [
                 {
                     "basicCard": {
-                        "title": f"'{keyword}' 나무위키 문서",
-                        "description": f"아래 버튼을 누르면 '{keyword}' 나무위키 문서로 바로 이동합니다.",
+                        "title": f"'{keyword}' 문서 바로가기",
+                        "description": "아래 버튼을 누르면 나무위키로 연결됩니다.",
                         "buttons": [
                             {
                                 "action": "webLink",
-                                "label": "나무위키에서 보기",
-                                "webLinkUrl": namu_url
+                                "label": "나무위키 열기",
+                                "webLinkUrl": namu_url,
+                                "mobileWebLinkUrl": namu_url  # 모바일 환경 대응 추가
                             }
                         ]
                     }
