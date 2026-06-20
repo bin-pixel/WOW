@@ -149,6 +149,38 @@ def namu_link():
 
     return jsonify(response)
 
+@app.route("/test-link", methods=["POST"])
+def firebase_link():
+    data = request.get_json(silent=True) or {}
+    
+    # 이동할 고정 타겟 URL
+    target_url = "https://bin-pixel.github.io/firebase/"
+
+    response = {
+        "version": "2.0",
+        "template": {
+            "outputs": [
+                {
+                    "basicCard": {
+                        "title": "<DevPrompt Lab 바로가기>",
+                        "description": "아래 버튼을 개발을 연습하기 위한 웹사이트로 이동합니다.",
+                        # thumbnail 항목을 제외하여 이미지를 없앱니다.
+                        "buttons": [
+                            {
+                                "action": "webLink",
+                                "label": "DevPrompt Lab 열기",
+                                "webLinkUrl": target_url,
+                                "mobileWebLinkUrl": target_url  # 모바일 카카오톡 앱 환경 대응
+                            }
+                        ]
+                    }
+                }
+            ]
+        }
+    }
+
+    return jsonify(response)
+
 # 5. 파라미터로 ChatGPT 연동하기
 @app.route("/chatgpt-param", methods=["POST"])
 def chatgpt_param():
